@@ -5,7 +5,9 @@ title: Code
 
 # Code
 
-This component demonstrates how to syntax-highlight code blocks in Razor components coming from markdown files using ["Prism.js."](https://prismjs.com/) See the source code [here](https://github.com/jsakamoto/MD2RazorGenerator/blob/main/SampleSites/BlazorWasmApp1/Pages/Code.md.cs) as well.
+This component demonstrates how to syntax-highlight code blocks in Razor components coming from markdown files using ["Prism.js."](https://prismjs.com/)
+
+See the source code [here](https://github.com/jsakamoto/MD2RazorGenerator/blob/main/SampleSites/BlazorWasmApp1/Pages/Code.md.cs) as well.
 
 HTML
 
