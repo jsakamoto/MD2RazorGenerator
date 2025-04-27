@@ -1,0 +1,6 @@
+<Project>
+
+  <Import Project="MD2RazorPopulateMarkdownFiles.targets" />
+  <Import Project="MD2RazorGenerateRazorClassDeclarations.targets" />
+
+</Project>

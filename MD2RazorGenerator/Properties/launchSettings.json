@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MD2RazorGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\MD2RazorGenerator.Test\\MD2RazorGenerator.Test.csproj"
+    }
+  }
+}

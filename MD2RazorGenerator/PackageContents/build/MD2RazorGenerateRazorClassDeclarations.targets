@@ -1,0 +1,32 @@
+<Project>
+
+  <UsingTask TaskName="Toolbelt.Blazor.MD2Razor.GenerateRazorClassDeclarationsFromMarkdown" AssemblyFile="$(MSBuildThisFileDirectory)..\tools\MD2RazorGenerator.MSBuild.Task.dll" />
+
+  <PropertyGroup>
+    <CoreCompileDependsOn>$(CoreCompileDependsOn);_MD2Razor_GenerateRazorClassDeclarations</CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <!-- GENERATES RAZOR CLASS DECLARATIONS FROM MARKDOWN FILES -->
+  <Target Name="_MD2Razor_GenerateRazorClassDeclarations" DependsOnTargets="_MD2Razor_PopulateMarkdownFiles">
+    <PropertyGroup>
+      <MD2RazorRazorClassDeclarationsDir Condition=" '$(MD2RazorRazorClassDeclarationsDir)' == '' ">$(IntermediateOutputPath)md2razor</MD2RazorRazorClassDeclarationsDir>
+    </PropertyGroup>
+
+    <Toolbelt.Blazor.MD2Razor.GenerateRazorClassDeclarationsFromMarkdown
+        MarkdownFiles="@(_MD2Razor_MarkdownFile->'%(FullPath)')"
+        OutputDir="$(MD2RazorRazorClassDeclarationsDir)"
+        ProjectDir="$(ProjectDir)"
+        RootNamespace="$(RootNamespace)"
+        DefaultBaseClass="$(MD2RazorDefaultBaseClass)"
+      >
+      <Output TaskParameter="Generated" ItemName="_MD2Razor_RazorClassDeclaration" />
+    </Toolbelt.Blazor.MD2Razor.GenerateRazorClassDeclarationsFromMarkdown>
+
+    <ItemGroup>
+      <Compile Remove="$(MD2RazorRazorClassDeclarationsDir)\*.cs" />
+      <Compile Include="@(_MD2Razor_RazorClassDeclaration)" />
+    </ItemGroup>
+
+  </Target>
+
+</Project>

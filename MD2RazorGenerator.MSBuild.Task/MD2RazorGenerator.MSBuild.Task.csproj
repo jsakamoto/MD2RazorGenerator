@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Toolbelt.Blazor.MD2Razor</RootNamespace>
+  </PropertyGroup>
+
+  <Import Project="..\VersionInfo.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.9.20" />
+    <PackageReference Include="Markdig" Version="0.41.0" GeneratePathProperty="true" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" GeneratePathProperty="true" />
+    <PackageReference Include="System.Memory" Version="4.6.3" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <Target Name="CopyNuGetPackagesDlls" AfterTargets="Build">
+    <Copy SourceFiles="$(PKGMarkdig)\lib\netstandard2.0\Markdig.dll" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$(PKGYamlDotNet)\lib\netstandard2.0\YamlDotNet.dll" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$(PKGSystem_Memory)\lib\netstandard2.0\System.Memory.dll" DestinationFolder="$(OutDir)" />
+  </Target>
+
+  <Import Project="..\MD2RazorGenerator.Shared\MD2RazorGenerator.Shared.projitems" Label="Shared" />
+
+</Project>

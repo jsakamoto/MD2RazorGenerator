@@ -1,0 +1,31 @@
+<Project>
+
+  <!-- EXPOSE MSBUILD PROPERTY TO THE MD2RAZOR SOURCE GENERATOR -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ProjectDir" />
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="MD2RazorDefaultBaseClass" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CoreCompileDependsOn>$(CoreCompileDependsOn);_MD2Razor_PopulateMarkdownFiles</CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <!-- INCLUDES *.MD TO BE PROCEEDED BY THE MD2RAZOR SOURCE GENERATOR -->
+  <Target Name="_MD2Razor_PopulateMarkdownFiles">
+
+    <PropertyGroup>
+      <_MD2Razor_MarkdownFile_Pattern Condition=" '$(_MD2Razor_MarkdownFile_Pattern)' == '' ">**\*.md</_MD2Razor_MarkdownFile_Pattern>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_MD2Razor_MarkdownFile Include="$(_MD2Razor_MarkdownFile_Pattern)" />
+      <Content Remove="@(_MD2Razor_MarkdownFile)" />
+      <ContentWithTargetPath Remove="@(_MD2Razor_MarkdownFile)" />
+      <AdditionalFiles Remove="@(_MD2Razor_MarkdownFile->'%(FullPath)')" />
+      <AdditionalFiles Include="@(_MD2Razor_MarkdownFile->'%(FullPath)')" />
+    </ItemGroup>
+
+  </Target>
+
+</Project>
