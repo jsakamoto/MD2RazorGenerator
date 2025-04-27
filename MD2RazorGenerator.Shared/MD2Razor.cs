@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using Markdig;
 using Markdig.Extensions.Yaml;
 using Markdig.Renderers.Html;
@@ -109,7 +110,7 @@ public class MD2Razor
                     default;
                 if (string.IsNullOrEmpty(url)) continue;
 
-                if (Uri.TryCreate(url, UriKind.Absolute, out _))
+                if (Regex.IsMatch(url, "^[a-z]+://"))
                 {
                     var attributes = node.GetAttributes();
                     attributes.AddPropertyIfNotExist("target", "_blank");
