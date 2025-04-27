@@ -1,0 +1,24 @@
+name: unit tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  perform-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - uses: actions/checkout@v4
+
+      # Install .NET SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+
+      # Perform unit tests
+      - name: Perform unit tests
+        run: dotnet test MD2RazorGenerator.Test -l "console;verbosity=normal" -v:q --nologo -tl:off
