@@ -1,2 +1,5 @@
-v.1.0.0
-- 1st release.
+v.1.1.0  
+- Added support for specifying a custom layout class using the "$layout" key in YAML front matter.  
+
+v.1.0.0  
+- Initial release.
