@@ -68,6 +68,12 @@ public class MD2Razor
                 sourceBuilder.AppendLine($"[global::Microsoft.AspNetCore.Components.RouteAttribute(\"{page}\")]");
             }
 
+            // Generate the layout attributes for the generated class.
+            if (!string.IsNullOrWhiteSpace(frontMatter.Layout))
+            {
+                sourceBuilder.AppendLine($"[global::Microsoft.AspNetCore.Components.LayoutAttribute(typeof({frontMatter.Layout}))]");
+            }
+
             // Generate other attributes for the generated class.
             foreach (var attrib in frontMatter.Attributes)
             {
@@ -165,6 +171,7 @@ public class MD2Razor
             usings: getFrontMatterEntry(yamlNodeMap, "$using"),
             namespaces: getFrontMatterEntry(yamlNodeMap, "$namespace"),
             attributes: getFrontMatterEntry(yamlNodeMap, "$attribute"),
+            layouts: getFrontMatterEntry(yamlNodeMap, "$layout"),
             inherits: getFrontMatterEntry(yamlNodeMap, "$inherit"),
             pageTitles: getFrontMatterEntry(yamlNodeMap, "title")
         );

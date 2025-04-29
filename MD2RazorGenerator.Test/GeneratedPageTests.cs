@@ -28,11 +28,12 @@ public class GeneratedPageTests
     [Test]
     public void WithYamlFrontMatter_Scalar_Test()
     {
-        // A [Foo] and a [Route] attribute in the front matter
+        // A [Foo], a [Route], and a [Layout] attribute in the front matter
         var attributes = typeof(Sample02_WithYamlFrontMatter_Scalar).GetCustomAttributes(inherit: true);
-        attributes.Length.Is(2, "Expected 2 attribute, but found {0}");
+        attributes.Length.Is(3, "Expected 3 attribute, but found {0}");
         attributes.OfType<FooAttribute>().Single().Text.Is("Hello", "Expected FooAttribute with 'Hello', but not found");
         attributes.OfType<RouteAttribute>().Single().Template.Is("/sample02", "Expected RouteAttribute with '/sample02', but not found");
+        attributes.OfType<LayoutAttribute>().Single().LayoutType.Is(typeof(MainLayoutA));
 
         // The namespace specified in the front matter
         typeof(Sample02_WithYamlFrontMatter_Scalar).Namespace.Is("Lorem.Ipsum");
@@ -44,15 +45,16 @@ public class GeneratedPageTests
     [Test]
     public void WithYamlFrontMatter_Sequence_Test()
     {
-        // A [Foo], a [Bar], and three [Route] attributes in the front matter
+        // A [Foo], a [Bar], three [Route], and a [Layout] attributes in the front matter
         var attributes = typeof(Sample03_WithYamlFrontMatter_Sequence).GetCustomAttributes(inherit: true);
-        attributes.Length.Is(5, "Expected 5 attribute, but found {0}");
+        attributes.Length.Is(6, "Expected 6 attribute, but found {0}");
         attributes.OfType<FooAttribute>().Single().Text.Is("Hello", "Expected FooAttribute with 'Hello', but not found");
         attributes.OfType<BarAttribute>().Single().Text.Is("World", "Expected FooAttribute with 'World', but not found");
         attributes.OfType<RouteAttribute>().Select(a => a.Template).Order().Is(
             "/sample03",
             "/sample03/A",
             "/sample03/B");
+        attributes.OfType<LayoutAttribute>().Single().LayoutType.Is(typeof(MainLayoutB));
 
         // The namespace specified the first in the sequence
         typeof(Sample03_WithYamlFrontMatter_Sequence).Namespace.Is("Fizz.Buzz.FizzBuzz");
