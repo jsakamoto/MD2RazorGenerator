@@ -8,6 +8,8 @@ MD2RazorGenerator is a C# source generator NuGet package for Blazor that convert
 
 ![](https://raw.githubusercontent.com/jsakamoto/MD2RazorGenerator/refs/heads/main/.assets/social-media.png)
 
+Live Demo Site: [https://jsakamoto.github.io/MD2RazorGenerator/](https://jsakamoto.github.io/MD2RazorGenerator/)
+
 Generated components work seamlessly with all Blazor rendering modes, including Server, WebAssembly, and Server-Side Rendering (SSR). It also fully supports hot reload, ensuring a smooth and productive development experience regardless of your chosen hosting model.
 
 ## Quick Start
@@ -65,6 +67,7 @@ The following keys are available in the YAML front matter of Markdown files:
 | $using     | Using directives for the generated Razor component. Functions like the `@using` directive. | Yes |
 | $namespace | The namespace for the generated Razor component. | No |
 | $attribute | Attributes for the generated Razor component. Functions like the `@attribute` directive. | Yes |
+| $layout    | The layout class for the generated Razor component. Functions like the `@layout` directive. | No |
 | $inherit   | The base class for the generated Razor component. Functions like the `@inherits` directive. | No |
 
 ## MSBuild Properties
