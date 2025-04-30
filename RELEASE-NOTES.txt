@@ -1,3 +1,6 @@
+v.1.1.2
+- Fix: Warning RZ10012 was triggered when the MD2RazorDefaultBaseClass MSBuild property was changed.
+
 v.1.1.1
 - Fix: "dotnet clean" was not functioning as expected.
 
