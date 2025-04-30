@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.Text;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Toolbelt.Blazor.MD2Razor.Internals;
 
@@ -31,6 +32,10 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
             defaultBaseClass: this.DefaultBaseClass ?? ""
         );
 
+        // Check if the global options have changed since the last generation
+        // If they have, we need to regenerate all files.
+        var globalOptionsHasBeenChanged = this.CheckGlobalOptionsHasBeenChanged(globalOptions);
+
         var md2razor = new MD2Razor();
         var generatedFilesPath = new List<string>();
         Parallel.ForEach(this.MarkdownFiles ?? [], markdownFile =>
@@ -40,10 +45,13 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
             var outputPath = Path.Combine(this.OutputDir ?? "", $"{className}.g.cs");
             generatedFilesPath.Add(outputPath);
 
-            // Skip if the generated file is up to date
-            var markdownTimestamp = File.GetLastWriteTime(markdownFile.ItemSpec);
-            var outputTimestamp = File.Exists(outputPath) ? File.GetLastWriteTime(outputPath) : DateTime.MinValue;
-            if (markdownTimestamp <= outputTimestamp) return;
+            // Skip if the generated file is up to date as long as the global options have not changed
+            if (!globalOptionsHasBeenChanged)
+            {
+                var markdownTimestamp = File.GetLastWriteTime(markdownFile.ItemSpec);
+                var outputTimestamp = File.Exists(outputPath) ? File.GetLastWriteTime(outputPath) : DateTime.MinValue;
+                if (markdownTimestamp <= outputTimestamp) return;
+            }
 
             // Generate the Razor component class declaration code from the Markdown file
             var markdownText = File.ReadAllText(markdownFile.ItemSpec);
@@ -60,5 +68,53 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
 
         this.Generated = generatedFilesPath.Select(p => new TaskItem(p)).ToArray();
         return true;
+    }
+
+    /// <summary>
+    /// Determines whether the global options have changed compared to the previously saved state.
+    /// </summary>
+    /// <remarks>This method checks for changes in the global options by comparing the provided options  with
+    /// the options stored in a file located in the output directory. If the file does not  exist or the options have
+    /// changed, the method updates the file with the current options.</remarks>
+    /// <param name="globalOptions">The current global options to compare against the previously saved options.</param>
+    /// <returns><see langword="true"/> if the global options have changed since the last saved state;  otherwise, <see
+    /// langword="false"/>.</returns>
+    private bool CheckGlobalOptionsHasBeenChanged(GlobalOptions globalOptions)
+    {
+        var globalOptionsHasBeenChanged = false;
+        var prevGlobalOptionsPath = Path.Combine(this.OutputDir, ".globaloptions");
+        var prevGlobalOptionsExists = File.Exists(prevGlobalOptionsPath);
+
+        // If the previous global options file exists, read it and compare with the current global options
+        if (prevGlobalOptionsExists)
+        {
+            var entries = new Dictionary<string, string>();
+            foreach (var globalOptionLine in File.ReadLines(prevGlobalOptionsPath, Encoding.UTF8))
+            {
+                var parts = globalOptionLine.Split(['='], 2);
+                if (parts.Length != 2) continue;
+                entries[parts[0].Trim()] = parts[1].Trim();
+            }
+            string getValue(string key) => entries.TryGetValue(key, out var value) ? value : string.Empty;
+            var prevGlobalOptions = new GlobalOptions(
+                rootNamespace: getValue(nameof(this.RootNamespace)),
+                projectDir: getValue(nameof(this.ProjectDir)),
+                defaultBaseClass: getValue(nameof(this.DefaultBaseClass))
+            );
+            globalOptionsHasBeenChanged = !globalOptions.Equals(prevGlobalOptions);
+        }
+
+        // If the previous global options file does not exist or the options have changed, write the new global options to the file
+        if (!prevGlobalOptionsExists || globalOptionsHasBeenChanged)
+        {
+            File.WriteAllLines(prevGlobalOptionsPath,
+            [
+                $"{nameof(this.RootNamespace)}={globalOptions.RootNamespace}",
+            $"{nameof(this.ProjectDir)}={globalOptions.ProjectDir}",
+            $"{nameof(this.DefaultBaseClass)}={globalOptions.DefaultBaseClass}"
+            ], Encoding.UTF8);
+        }
+
+        return globalOptionsHasBeenChanged;
     }
 }
