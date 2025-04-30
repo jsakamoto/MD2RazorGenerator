@@ -25,6 +25,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="Toolbelt.WorkDirectory" Version="1.1.0.1" />
+    <PackageReference Include="XProcess" Version="1.4.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +44,16 @@
     <Using Include="MD2RazorGenerator.Test" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Fixtures\SampleProjects\**\*.*" />
+    <Content Remove="Fixtures\SampleProjects\**\*.*" />
+    <None Remove="Fixtures\SampleProjects\**\*.*" />
+    <None Include="Fixtures\SampleProjects\**\*.*" />
+    <None Remove="Fixtures\SampleProjects\**\*.user" />
+    <None Remove="Fixtures\SampleProjects\**\bin\**\*.*" />
+    <None Remove="Fixtures\SampleProjects\**\obj\**\*.*" />
+  </ItemGroup>
+  
   <Import Project="../MD2RazorGenerator/PackageContents/build/MD2RazorPopulateMarkdownFiles.targets" />
 
 </Project>
