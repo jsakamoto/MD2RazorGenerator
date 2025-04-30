@@ -42,6 +42,66 @@ public class BuildTests
     }
 
     [Test]
+    public async Task Change_BaseClass_from_Default_to_Custom_Test()
+    {
+        using var testContext = new TestContext();
+
+        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+            build.ExitCode.Is(0, build.Output);
+
+        using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
+        {
+            using var module = assembly.MainModule;
+            module.GetType("Project01.Welcome")
+                .IsNotNull("The type 'Project01.Welcome' was not found in the assembly.")
+                .BaseType.IsNotNull("The type 'Project01.Welcome' does not have a base type.")
+                .FullName.Is("Microsoft.AspNetCore.Components.ComponentBase");
+        }
+
+        using (var build = await XProcess.Start("dotnet", "build -p MD2RazorDefaultBaseClass=Project01.CustomComponentBase", testContext.WorkDir).WaitForExitAsync())
+            build.ExitCode.Is(0, build.Output);
+
+        using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
+        {
+            using var module = assembly.MainModule;
+            module.GetType("Project01.Welcome")
+                .IsNotNull("The type 'Project01.Welcome' was not found in the assembly.")
+                .BaseType.IsNotNull("The type 'Project01.Welcome' does not have a base type.")
+                .FullName.Is("Project01.CustomComponentBase");
+        }
+    }
+
+    [Test]
+    public async Task Change_BaseClass_from_Custom_to_Default_Test()
+    {
+        using var testContext = new TestContext();
+
+        using (var build = await XProcess.Start("dotnet", "build -p MD2RazorDefaultBaseClass=Project01.CustomComponentBase", testContext.WorkDir).WaitForExitAsync())
+            build.ExitCode.Is(0, build.Output);
+
+        using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
+        {
+            using var module = assembly.MainModule;
+            module.GetType("Project01.Welcome")
+                .IsNotNull("The type 'Project01.Welcome' was not found in the assembly.")
+                .BaseType.IsNotNull("The type 'Project01.Welcome' does not have a base type.")
+                .FullName.Is("Project01.CustomComponentBase");
+        }
+
+        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+            build.ExitCode.Is(0, build.Output);
+
+        using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
+        {
+            using var module = assembly.MainModule;
+            module.GetType("Project01.Welcome")
+                .IsNotNull("The type 'Project01.Welcome' was not found in the assembly.")
+                .BaseType.IsNotNull("The type 'Project01.Welcome' does not have a base type.")
+                .FullName.Is("Microsoft.AspNetCore.Components.ComponentBase");
+        }
+    }
+
+    [Test]
     public async Task Clean_Test()
     {
         using var testContext = new TestContext();
