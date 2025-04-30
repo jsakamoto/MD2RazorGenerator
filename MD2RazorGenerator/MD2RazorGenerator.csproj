@@ -37,6 +37,7 @@
     <None Include="..\README.md" Visible="false" Pack="true" PackagePath="/" />
     <None Include="..\THIRDPARTYNOTICES.txt" Visible="false" Pack="true" PackagePath="/notices" />
     <None Include="PackageContents\build\**\*" Pack="true" PackagePath="build\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Remove="PackageContents\tools\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,7 +67,7 @@
       <TfmSpecificPackageFile Include="$(PKGMarkdig)\lib\netstandard2.0\*.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(PKGYamlDotNet)\lib\netstandard2.0\*.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(PKGSystem_Memory)\lib\netstandard2.0\*.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(MD2RazorMSBuildTaskProjectDir)bin\Release\netstandard2.0\*.dll" PackagePath="tools" />
+      <TfmSpecificPackageFile Include="@(_MD2Razor_MSBuildTaskOutput)" PackagePath="tools" />
     </ItemGroup>
   </Target>
 
@@ -84,11 +85,17 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="BuildMD2RazorMSBuildTask">
+  <Target Name="BuildMD2RazorMSBuildTask" BeforeTargets="BeforeBuild">
     <PropertyGroup>
       <MD2RazorMSBuildTaskProjectDir>..\MD2RazorGenerator.MSBuild.Task\</MD2RazorMSBuildTaskProjectDir>
     </PropertyGroup>
     <Exec Command="dotnet build -c Release" WorkingDirectory="$(MD2RazorMSBuildTaskProjectDir)"/>
+    <ItemGroup>
+      <_MD2Razor_MSBuildTaskOutput Include="$(MD2RazorMSBuildTaskProjectDir)bin\Release\netstandard2.0\*.dll" />
+    </ItemGroup>
+    
+    <!-- This copy process is not essential, but it is needed for debugging and testing the MSBuild task. -->
+    <Copy SourceFiles="@(_MD2Razor_MSBuildTaskOutput)" DestinationFolder="PackageContents\tools" SkipUnchangedFiles="true" />
   </Target>
 
   <Import Project="..\MD2RazorGenerator.Shared\MD2RazorGenerator.Shared.projitems" Label="Shared" />
