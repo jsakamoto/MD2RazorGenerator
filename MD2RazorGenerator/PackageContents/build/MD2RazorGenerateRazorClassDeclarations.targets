@@ -6,11 +6,14 @@
     <CoreCompileDependsOn>$(CoreCompileDependsOn);_MD2Razor_GenerateRazorClassDeclarations</CoreCompileDependsOn>
   </PropertyGroup>
 
-  <!-- GENERATES RAZOR CLASS DECLARATIONS FROM MARKDOWN FILES -->
-  <Target Name="_MD2Razor_GenerateRazorClassDeclarations" DependsOnTargets="_MD2Razor_PopulateMarkdownFiles">
+  <Target Name="_MD2Razor_DefineProperties">
     <PropertyGroup>
       <MD2RazorRazorClassDeclarationsDir Condition=" '$(MD2RazorRazorClassDeclarationsDir)' == '' ">$(IntermediateOutputPath)md2razor</MD2RazorRazorClassDeclarationsDir>
     </PropertyGroup>
+  </Target>
+
+  <!-- GENERATES RAZOR CLASS DECLARATIONS FROM MARKDOWN FILES -->
+  <Target Name="_MD2Razor_GenerateRazorClassDeclarations" DependsOnTargets="_MD2Razor_DefineProperties;_MD2Razor_PopulateMarkdownFiles">
 
     <Toolbelt.Blazor.MD2Razor.GenerateRazorClassDeclarationsFromMarkdown
         MarkdownFiles="@(_MD2Razor_MarkdownFile->'%(FullPath)')"
@@ -29,4 +32,7 @@
 
   </Target>
 
+  <Target Name="_MD2Razor_CleanGeneratedFiles" AfterTargets="Clean" DependsOnTargets="_MD2Razor_DefineProperties">
+    <RemoveDir Directories="$(MD2RazorRazorClassDeclarationsDir)" Condition="Exists('$(MD2RazorRazorClassDeclarationsDir)')" />
+  </Target>
 </Project>
