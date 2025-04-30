@@ -35,9 +35,9 @@ public class BuildTests
         using var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath);
         using var module = assembly.MainModule;
 
-        module.GetType("Project01.App")
-            .IsNotNull("The type 'Project01.App' was not found in the assembly.")
-            .BaseType.IsNotNull("The type 'Project01.App' does not have a base type.")
+        module.GetType("Project01.Welcome")
+            .IsNotNull("The type 'Project01.Welcome' was not found in the assembly.")
+            .BaseType.IsNotNull("The type 'Project01.Welcome' does not have a base type.")
             .FullName.Is("Project01.CustomComponentBase");
     }
 
@@ -45,7 +45,7 @@ public class BuildTests
     public async Task Clean_Test()
     {
         using var testContext = new TestContext();
-        var generatedFilePath = Path.Combine(testContext.WorkDir, "obj", "Debug", "net8.0", "md2razor", "App.g.cs");
+        var generatedFilePath = Path.Combine(testContext.WorkDir, "obj", "Debug", "net8.0", "md2razor", "Welcome.g.cs");
 
         using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
