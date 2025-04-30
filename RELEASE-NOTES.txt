@@ -1,3 +1,6 @@
+v.1.1.1
+- Fix: "dotnet clean" was not functioning as expected.
+
 v.1.1.0  
 - Added support for specifying a custom layout class using the "$layout" key in YAML front matter.  
 
