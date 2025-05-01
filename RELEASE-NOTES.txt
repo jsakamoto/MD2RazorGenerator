@@ -1,3 +1,6 @@
+v.1.1.3
+- Fix: Moving the location of .md files sometimes corrupted the build.
+
 v.1.1.2
 - Fix: Warning RZ10012 was triggered when the MD2RazorDefaultBaseClass MSBuild property was changed.
 
