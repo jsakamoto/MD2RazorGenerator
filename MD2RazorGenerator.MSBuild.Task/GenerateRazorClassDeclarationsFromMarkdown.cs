@@ -40,23 +40,27 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
         var generatedFilesPath = new List<string>();
         Parallel.ForEach(this.MarkdownFiles ?? [], markdownFile =>
         {
+            var markdownFilePath = markdownFile.ItemSpec;
+
             // Determine the output path for the generated file
-            var className = Path.GetFileNameWithoutExtension(markdownFile.ItemSpec).Replace('.', '_');
-            var outputPath = Path.Combine(this.OutputDir ?? "", $"{className}.g.cs");
+            var markdownDotSeparatedRelativePathName = TransformToDotSeparatedPath(markdownFilePath, this.ProjectDir ?? "");
+            var outputPath = Path.Combine(this.OutputDir ?? "", markdownDotSeparatedRelativePathName + ".g.cs");
             generatedFilesPath.Add(outputPath);
 
             // Skip if the generated file is up to date as long as the global options have not changed
             if (!globalOptionsHasBeenChanged)
             {
-                var markdownTimestamp = File.GetLastWriteTime(markdownFile.ItemSpec);
+                var markdownTimestamp = File.GetLastWriteTime(markdownFilePath);
                 var outputTimestamp = File.Exists(outputPath) ? File.GetLastWriteTime(outputPath) : DateTime.MinValue;
                 if (markdownTimestamp <= outputTimestamp) return;
             }
 
             // Generate the Razor component class declaration code from the Markdown file
-            var markdownText = File.ReadAllText(markdownFile.ItemSpec);
-            var (_, generatedCode) = md2razor.GenerateCode(markdownFile.ItemSpec, markdownText, globalOptions, declarationOnly: true);
+            var markdownText = File.ReadAllText(markdownFilePath);
+            var (_, generatedCode) = md2razor.GenerateCode(markdownFilePath, markdownText, globalOptions, declarationOnly: true);
             File.WriteAllText(outputPath, generatedCode);
+
+            //File.AppendAllLines(@"c:\temp\log.txt", [$"generated={outputPath}"], Encoding.UTF8);
         });
 
         // Delete old generated files that are not in the current generation
@@ -81,7 +85,7 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
     /// langword="false"/>.</returns>
     private bool CheckGlobalOptionsHasBeenChanged(GlobalOptions globalOptions)
     {
-        var globalOptionsHasBeenChanged = false;
+        var globalOptionsHasBeenChanged = true;
         var prevGlobalOptionsPath = Path.Combine(this.OutputDir, ".globaloptions");
         var prevGlobalOptionsExists = File.Exists(prevGlobalOptionsPath);
 
@@ -115,6 +119,25 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
             ], Encoding.UTF8);
         }
 
+        //File.AppendAllLines(@"c:\temp\log.txt", ["", $"globalOptionsHasBeenChanged={globalOptionsHasBeenChanged}"], Encoding.UTF8);
+
         return globalOptionsHasBeenChanged;
+    }
+
+    private static string TransformToDotSeparatedPath(string path, string basePath)
+    {
+        static string transformPath(string path) =>
+            string.Join(".", path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar)).TrimEnd('.');
+
+        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(basePath)) return path;
+
+        basePath = transformPath(basePath);
+        path = transformPath(path);
+
+        if (path.StartsWith(basePath, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return path.Substring(basePath.Length).TrimStart('.');
+        }
+        return path;
     }
 }

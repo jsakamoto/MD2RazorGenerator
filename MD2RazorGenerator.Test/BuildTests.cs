@@ -104,17 +104,73 @@ public class BuildTests
     [Test]
     public async Task Clean_Test()
     {
+        // Given
         using var testContext = new TestContext();
-        var generatedFilePath = Path.Combine(testContext.WorkDir, "obj", "Debug", "net8.0", "md2razor", "Welcome.g.cs");
+        var generatedFilePath = Path.Combine(testContext.WorkDir, "obj", "Debug", "net8.0", "md2razor", "Welcome.md.g.cs");
 
         using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
 
-        File.Exists(generatedFilePath).IsTrue("The generated file was not found in the expected location.");
+        File.Exists(generatedFilePath).IsTrue("The generated file should be generated after build, but it was not.");
 
+        // When
         using (var clean = await XProcess.Start("dotnet", "clean", testContext.WorkDir).WaitForExitAsync())
             clean.ExitCode.Is(0, clean.Output);
 
-        File.Exists(generatedFilePath).IsFalse("The generated file was not deleted after clean.");
+        // Then
+        File.Exists(generatedFilePath).IsFalse("The generated file should be deleted after clean, but it was not.");
+    }
+
+    [Test]
+    public async Task Move_FileLocation_Test()
+    {
+        // Given
+        using var testContext = new TestContext();
+        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+            build.ExitCode.Is(0, build.Output);
+
+        using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
+        {
+            using var module = assembly.MainModule;
+            module.GetType("Project01.Welcome").IsNotNull("The type 'Project01.Welcome' was not found in the assembly.");
+            module.GetType("Project01.Pages.Welcome").IsNull("The type 'Project01.Pages.Welcome' should not be found in the assembly, but it was.");
+        }
+
+        // When
+        var oldPathOfWelcomeMd = Path.Combine(testContext.WorkDir, "Welcome.md");
+        var newPathOfWelcomeMd = Path.Combine(testContext.WorkDir, "Pages", "Welcome.md");
+        File.Move(oldPathOfWelcomeMd, newPathOfWelcomeMd);
+
+        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+            build.ExitCode.Is(0, build.Output);
+
+        // Then
+        using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
+        {
+            using var module = assembly.MainModule;
+            module.GetType("Project01.Pages.Welcome").IsNotNull("The type 'Project01.Pages.Welcome' was not found in the assembly.");
+            module.GetType("Project01.Welcome").IsNull("The type 'Project01.Welcome' should not be found in the assembly, but it was.");
+        }
+    }
+
+    [Test]
+    public async Task Has_Markdowns_with_SameName_in_DifferentDir_Test()
+    {
+        // Given
+        using var testContext = new TestContext();
+        Directory.CreateDirectory(Path.Combine(testContext.WorkDir, "AnotherDir"));
+        File.Copy(
+            Path.Combine(testContext.WorkDir, "Welcome.md"),
+            Path.Combine(testContext.WorkDir, "AnotherDir", "Welcome.md"));
+
+        // When
+        using var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync();
+        build.ExitCode.Is(0, build.Output);
+
+        // Then: There should be two types with the same name in different namespaces
+        using var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath);
+        using var module = assembly.MainModule;
+        module.GetType("Project01.Welcome").IsNotNull("The type 'Project01.Welcome' should exist in the assembly, but it was not found.");
+        module.GetType("Project01.AnotherDir.Welcome").IsNotNull("The type 'Project01.AnotherDir.Welcome' should exist in the assembly, but it was not found.");
     }
 }
