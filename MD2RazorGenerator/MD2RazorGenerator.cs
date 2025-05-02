@@ -29,8 +29,9 @@ public partial class MD2RazorGenerator : IIncrementalGenerator
             var markdownText = markdownFile.GetText(context.CancellationToken)?.ToString();
             if (markdownText is null) return;
 
-            var (className, generatedCode) = md2razor.GenerateCode(markdownFile.Path, markdownText, globalOptions);
-            context.AddSource($"{className}.g.cs", generatedCode);
+            var generatedCode = md2razor.GenerateCode(markdownFile.Path, markdownText, globalOptions);
+            var hintName = MD2Razor.TransformToDotSeparatedPath(markdownFile.Path, globalOptions.ProjectDir) + ".g.cs";
+            context.AddSource(hintName, generatedCode);
         });
     }
 

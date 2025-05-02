@@ -35,8 +35,8 @@ public class MD2Razor
     /// <param name="markdownText">The content of the Markdown file.</param>
     /// <param name="globalOptions">Global options such as the root namespace and project directory.</param>
     /// <param name="declarationOnly">If set to <c>true</c>, only the class declaration and its metadata (e.g., namespace and using directives) will be generated without the implementation of the <c>BuildRenderTree</c> method.</param>
-    /// <returns>A tuple containing the class name and the generated source code.</returns>
-    internal (string className, string generatedCode) GenerateCode(string markdownPath, string markdownText, GlobalOptions globalOptions, bool declarationOnly = false)
+    /// <returns>The generated source code.</returns>
+    internal string GenerateCode(string markdownPath, string markdownText, GlobalOptions globalOptions, bool declarationOnly = false)
     {
         // Parse the Markdown content into a Markdown document using the configured pipeline.
         var markdownDoc = Markdown.Parse(markdownText, this._markdownPipeline);
@@ -133,7 +133,7 @@ public class MD2Razor
 
         sourceBuilder.AppendLine("}"); // End of class
 
-        return (className, sourceBuilder.ToString());
+        return sourceBuilder.ToString();
     }
 
     /// <summary>
@@ -196,5 +196,29 @@ public class MD2Razor
 
         // Combine the root namespace and the relative path.
         return (globalOptions.RootNamespace + "." + namespacePath).Trim('.');
+    }
+
+    /// <summary>
+    /// Transforms a file path to a dot-separated path based on the provided base path.
+    /// </summary>
+    /// <remarks>When the file path is "/foo/bar/baz.txt" and the base path is "/foo", the result will be "bar.baz.txt".</remarks>
+    /// <param name="path">A file path to transform. This can be a relative or absolute path.</param>
+    /// <param name="basePath">A base path to use for the transformation. This should be a directory path.</param>
+    /// <returns>returns a dot-separated path that represents the file's location relative to the base path.</returns>
+    internal static string TransformToDotSeparatedPath(string path, string basePath)
+    {
+        static string transformPath(string path) =>
+            string.Join(".", path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar)).TrimEnd('.');
+
+        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(basePath)) return path;
+
+        basePath = transformPath(basePath);
+        path = transformPath(path);
+
+        if (path.StartsWith(basePath, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return path.Substring(basePath.Length).TrimStart('.');
+        }
+        return path;
     }
 }

@@ -43,8 +43,8 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
             var markdownFilePath = markdownFile.ItemSpec;
 
             // Determine the output path for the generated file
-            var markdownDotSeparatedRelativePathName = TransformToDotSeparatedPath(markdownFilePath, this.ProjectDir ?? "");
-            var outputPath = Path.Combine(this.OutputDir ?? "", markdownDotSeparatedRelativePathName + ".g.cs");
+            var hintName = MD2Razor.TransformToDotSeparatedPath(markdownFilePath, this.ProjectDir ?? "") + ".g.cs";
+            var outputPath = Path.Combine(this.OutputDir ?? "", hintName);
             generatedFilesPath.Add(outputPath);
 
             // Skip if the generated file is up to date as long as the global options have not changed
@@ -57,7 +57,7 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
 
             // Generate the Razor component class declaration code from the Markdown file
             var markdownText = File.ReadAllText(markdownFilePath);
-            var (_, generatedCode) = md2razor.GenerateCode(markdownFilePath, markdownText, globalOptions, declarationOnly: true);
+            var generatedCode = md2razor.GenerateCode(markdownFilePath, markdownText, globalOptions, declarationOnly: true);
             File.WriteAllText(outputPath, generatedCode);
 
             //File.AppendAllLines(@"c:\temp\log.txt", [$"generated={outputPath}"], Encoding.UTF8);
@@ -122,22 +122,5 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
         //File.AppendAllLines(@"c:\temp\log.txt", ["", $"globalOptionsHasBeenChanged={globalOptionsHasBeenChanged}"], Encoding.UTF8);
 
         return globalOptionsHasBeenChanged;
-    }
-
-    private static string TransformToDotSeparatedPath(string path, string basePath)
-    {
-        static string transformPath(string path) =>
-            string.Join(".", path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar)).TrimEnd('.');
-
-        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(basePath)) return path;
-
-        basePath = transformPath(basePath);
-        path = transformPath(path);
-
-        if (path.StartsWith(basePath, StringComparison.InvariantCultureIgnoreCase))
-        {
-            return path.Substring(basePath.Length).TrimStart('.');
-        }
-        return path;
     }
 }
