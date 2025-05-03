@@ -17,6 +17,7 @@
 
     <Toolbelt.Blazor.MD2Razor.GenerateRazorClassDeclarationsFromMarkdown
         MarkdownFiles="@(_MD2Razor_MarkdownFile->'%(FullPath)')"
+        ImportsFiles="@(_MD2Razor_ImportsFile->'%(FullPath)')"
         OutputDir="$(MD2RazorRazorClassDeclarationsDir)"
         ProjectDir="$(ProjectDir)"
         RootNamespace="$(RootNamespace)"

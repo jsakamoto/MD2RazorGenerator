@@ -11,6 +11,9 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Internals\FrontMatter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internals\GlobalOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internals\Imports.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internals\ImportsCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internals\PathUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MD2Razor.cs" />
   </ItemGroup>
 </Project>

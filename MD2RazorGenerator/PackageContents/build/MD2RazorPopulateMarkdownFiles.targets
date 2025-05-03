@@ -19,11 +19,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <_MD2Razor_ImportsFile Include="**\_Imports.razor" />
       <_MD2Razor_MarkdownFile Include="$(_MD2Razor_MarkdownFile_Pattern)" />
       <Content Remove="@(_MD2Razor_MarkdownFile)" />
       <ContentWithTargetPath Remove="@(_MD2Razor_MarkdownFile)" />
       <AdditionalFiles Remove="@(_MD2Razor_MarkdownFile->'%(FullPath)')" />
       <AdditionalFiles Include="@(_MD2Razor_MarkdownFile->'%(FullPath)')" />
+      <AdditionalFiles Include="@(_MD2Razor_ImportsFile->'%(FullPath)')" />
     </ItemGroup>
 
   </Target>

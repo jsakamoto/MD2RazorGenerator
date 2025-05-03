@@ -38,6 +38,7 @@
     <None Include="..\THIRDPARTYNOTICES.txt" Visible="false" Pack="true" PackagePath="/notices" />
     <None Include="PackageContents\build\**\*" Pack="true" PackagePath="build\%(RecursiveDir)%(Filename)%(Extension)" />
     <None Remove="PackageContents\tools\**\*" />
+    <InternalsVisibleTo Include="MD2RazorGenerator.Test" />
   </ItemGroup>
 
   <ItemGroup>

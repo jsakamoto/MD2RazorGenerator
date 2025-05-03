@@ -3,7 +3,9 @@ using Fizz.Buzz.FizzBuzz;
 using Lorem.Ipsum;
 using MD2RazorGenerator.Test.Fixtures;
 using MD2RazorGenerator.Test.Fixtures.Attributes;
+using MD2RazorGenerator.Test.Fixtures.Attributes.FizzBuzz;
 using MD2RazorGenerator.Test.Fixtures.ComponentTypes;
+using MD2RazorGenerator.Test.Fixtures.ComponentTypes.OtherLayouts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -104,6 +106,16 @@ public class GeneratedPageTests
         pageTitleComponent.Instance.ChildContent.IsNotNull("Page title content should be specified, but did'nt.");
         using var pageTitleText = context.Render(pageTitleComponent.Instance.ChildContent);
         pageTitleText.Markup.Is("Sample 03");
+    }
+
+    [Test]
+    public void DependsOn_ImportsRazor_Test()
+    {
+        // A [FizzBuzz] and a [Layout] attribute in the front matter
+        var attributes = typeof(Sample06_DependsImports).GetCustomAttributes(inherit: true);
+        attributes.Length.Is(2, "Expected 2 attribute, but found {0}");
+        attributes.OfType<FizzBuzzAttribute>().Single().Text.Is("Hello, World!", "Expected FizzBuzzAttribute with 'Hello, World!', but not found");
+        attributes.OfType<LayoutAttribute>().Single().LayoutType.Is(typeof(MainLayoutC));
     }
 
     [Test]

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);MSB3243</NoWarn>
-    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable;RZ10012;CS8785;CS0105</WarningsAsErrors>
 
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
@@ -43,6 +43,10 @@
     <Using Include="NUnit.Framework" />
     <Using Include="MD2RazorGenerator.Test" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <_MD2Razor_MarkdownFile_Pattern>Fixtures\*.md</_MD2Razor_MarkdownFile_Pattern>
+  </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Fixtures\SampleProjects\**\*.*" />

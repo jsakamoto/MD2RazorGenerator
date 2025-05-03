@@ -11,6 +11,9 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
     public ITaskItem[]? MarkdownFiles { get; set; }
 
     [Required]
+    public ITaskItem[]? ImportsFiles { get; set; }
+
+    [Required]
     public string? OutputDir { get; set; }
 
     public string? RootNamespace { get; set; }
@@ -25,6 +28,11 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
     public override bool Execute()
     {
         if (!Directory.Exists(this.OutputDir)) Directory.CreateDirectory(this.OutputDir);
+
+        // Load the imports files and read their content
+        var importsCollection = (this.ImportsFiles ?? [])
+            .Select(imports => new Imports(path: imports.ItemSpec, text: File.ReadAllText(imports.ItemSpec)))
+            .ToArray();
 
         var globalOptions = new GlobalOptions(
             rootNamespace: this.RootNamespace ?? "",
@@ -57,10 +65,9 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
 
             // Generate the Razor component class declaration code from the Markdown file
             var markdownText = File.ReadAllText(markdownFilePath);
-            var generatedCode = md2razor.GenerateCode(markdownFilePath, markdownText, globalOptions, declarationOnly: true);
+            var applicableImports = importsCollection.GetApplicableImports(markdownFilePath);
+            var generatedCode = md2razor.GenerateCode(markdownFilePath, markdownText, applicableImports, globalOptions, declarationOnly: true);
             File.WriteAllText(outputPath, generatedCode);
-
-            //File.AppendAllLines(@"c:\temp\log.txt", [$"generated={outputPath}"], Encoding.UTF8);
         });
 
         // Delete old generated files that are not in the current generation
@@ -118,8 +125,6 @@ public class GenerateRazorClassDeclarationsFromMarkdown : Microsoft.Build.Utilit
             $"{nameof(this.DefaultBaseClass)}={globalOptions.DefaultBaseClass}"
             ], Encoding.UTF8);
         }
-
-        //File.AppendAllLines(@"c:\temp\log.txt", ["", $"globalOptionsHasBeenChanged={globalOptionsHasBeenChanged}"], Encoding.UTF8);
 
         return globalOptionsHasBeenChanged;
     }

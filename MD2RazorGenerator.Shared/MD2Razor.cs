@@ -33,10 +33,11 @@ public class MD2Razor
     /// </summary>
     /// <param name="markdownPath">The file path of the Markdown file.</param>
     /// <param name="markdownText">The content of the Markdown file.</param>
+    /// <param name="imports">A collection of additional using directives to include in the generated code.</param>
     /// <param name="globalOptions">Global options such as the root namespace and project directory.</param>
     /// <param name="declarationOnly">If set to <c>true</c>, only the class declaration and its metadata (e.g., namespace and using directives) will be generated without the implementation of the <c>BuildRenderTree</c> method.</param>
     /// <returns>The generated source code.</returns>
-    internal string GenerateCode(string markdownPath, string markdownText, GlobalOptions globalOptions, bool declarationOnly = false)
+    internal string GenerateCode(string markdownPath, string markdownText, IEnumerable<Imports> imports, GlobalOptions globalOptions, bool declarationOnly = false)
     {
         // Parse the Markdown content into a Markdown document using the configured pipeline.
         var markdownDoc = Markdown.Parse(markdownText, this._markdownPipeline);
@@ -46,7 +47,13 @@ public class MD2Razor
         var sourceBuilder = new StringBuilder();
 
         // Generate the using directives based on the front matter.
-        foreach (var usingItem in frontMatter.Usings)
+        var usings = imports
+            .GetApplicableImports(markdownPath)
+            .SelectMany(i => i.GetUsings())
+            .Concat(frontMatter.Usings)
+            .OrderBy(ns => ns)
+            .Distinct();
+        foreach (var usingItem in usings)
         {
             sourceBuilder.AppendLine($"using {usingItem};");
         }
@@ -207,13 +214,10 @@ public class MD2Razor
     /// <returns>returns a dot-separated path that represents the file's location relative to the base path.</returns>
     internal static string TransformToDotSeparatedPath(string path, string basePath)
     {
-        static string transformPath(string path) =>
-            string.Join(".", path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, Path.VolumeSeparatorChar)).TrimEnd('.');
-
         if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(basePath)) return path;
 
-        basePath = transformPath(basePath);
-        path = transformPath(path);
+        basePath = PathUtils.NormalizePath(basePath, '.');
+        path = PathUtils.NormalizePath(path, '.');
 
         if (path.StartsWith(basePath, StringComparison.InvariantCultureIgnoreCase))
         {

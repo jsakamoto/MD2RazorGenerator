@@ -18,18 +18,23 @@ public partial class MD2RazorGenerator : IIncrementalGenerator
         // Filter additional text files to include only Markdown (.md) files.
         var markdownFiles = context.AdditionalTextsProvider.Where(t => t.Path.EndsWith(".md"));
 
+        var importsProvider = context.AdditionalTextsProvider
+            .Where(t => Path.GetFileName(t.Path).Equals("_Imports.razor", StringComparison.InvariantCultureIgnoreCase))
+            .Select((t, token) => new Imports(t.Path, t.GetText(token)?.ToString()))
+            .Collect();
+
         // Create a provider to retrieve global options such as the root namespace and project directory.
         var globalOptionsProvider = GetGlobalOptionsProvider(context);
 
         // Register the source generation logic.
         var md2razor = new MD2Razor();
-        context.RegisterSourceOutput(markdownFiles.Combine(globalOptionsProvider), (context, pair) =>
+        context.RegisterSourceOutput(markdownFiles.Combine(globalOptionsProvider).Combine(importsProvider), (context, pair) =>
         {
-            var (markdownFile, globalOptions) = pair;
+            var ((markdownFile, globalOptions), imports) = pair;
             var markdownText = markdownFile.GetText(context.CancellationToken)?.ToString();
             if (markdownText is null) return;
 
-            var generatedCode = md2razor.GenerateCode(markdownFile.Path, markdownText, globalOptions);
+            var generatedCode = md2razor.GenerateCode(markdownFile.Path, markdownText, imports, globalOptions);
             var hintName = MD2Razor.TransformToDotSeparatedPath(markdownFile.Path, globalOptions.ProjectDir) + ".g.cs";
             context.AddSource(hintName, generatedCode);
         });
