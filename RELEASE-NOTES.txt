@@ -1,3 +1,6 @@
+v.1.2.0
+- Feature: Generated components now honor @using directives from _Imports.razor.
+
 v.1.1.4
 - Fix: Resolved CS8785 error that occurred when markdown files with the same name existed in different folders.
 

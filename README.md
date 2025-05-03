@@ -78,6 +78,17 @@ You can control the behavior of MD2RazorGenerator with the following MSBuild pro
 |----------|-------------|---------------|
 | MD2RazorDefaultBaseClass | The default base class for generated Razor components. | `Microsoft.AspNetCore.Components.ComponentBase` |
 
+## Known Limitations
+
+### _Imports.razor Parsing
+
+MD2RazorGenerator now supports reading `@using` directives from `_Imports.razor` files to apply them to generated components. However, the parser uses a simple regex-based approach that may not correctly handle complex scenarios. In particular:
+
+- Comments within the same line as a `@using` directive might cause parsing issues
+- Multi-line directives might not be properly recognized
+
+For best results, keep your `@using` directives in `_Imports.razor` files simple and on dedicated lines.
+
 ## Appendix: Code Syntax Highlighting
 
 This NuGet package does not provide code syntax highlighting itself. To enable code syntax highlighting, you can use [Prism.js](https://prismjs.com/). Follow these steps:
