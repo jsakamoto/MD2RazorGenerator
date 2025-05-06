@@ -12,12 +12,14 @@ public class ImportsTests
 
             @using System.Collections.Generic @* Comment *@
             @using System.Linq
+            @using static BlazingStory.Types.RenderMode
             """);
 
         imports.GetUsings().Is(
             "System",
             "System.Collections.Generic",
-            "System.Linq");
+            "System.Linq",
+            "static BlazingStory.Types.RenderMode");
     }
 
     [Test]

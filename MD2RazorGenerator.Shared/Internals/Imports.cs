@@ -41,7 +41,7 @@ internal class Imports : IEquatable<Imports?>
     public IEnumerable<string> GetUsings()
     {
         return this._usings ??= this._text.Split(['\n'], StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => Regex.Match(line, @"^[ \t]*@using[ \t]+(?<namespace>[^ \t;]+).*$"))
+            .Select(line => Regex.Match(line, @"^[ \t]*@using[ \t]+(?<namespace>(static[ \t]+)?[^ \t;]+).*$"))
             .Where(match => match.Success)
             .Select(match => match.Groups["namespace"].Value.Trim())
             .ToArray();
