@@ -162,6 +162,7 @@ public class BuildTests
         File.Copy(
             Path.Combine(testContext.WorkDir, "Welcome.md"),
             Path.Combine(testContext.WorkDir, "AnotherDir", "Welcome.md"));
+        File.ReadAllText(Path.Combine(testContext.WorkDir, "AnotherDir", "Welcome.md")).Trim().Is("# Hello, World!");
 
         // When
         using var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync();
