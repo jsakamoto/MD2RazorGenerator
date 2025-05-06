@@ -94,6 +94,7 @@ public class MD2Razor
 
         // Generate the class definition for the Razor component.
         var n = 0;
+        sourceBuilder.AppendLine("#pragma warning disable CS1591");
         sourceBuilder.AppendLine($"public partial class {className} : {baseClass}");
         sourceBuilder.AppendLine("{");
 
@@ -139,6 +140,7 @@ public class MD2Razor
         }
 
         sourceBuilder.AppendLine("}"); // End of class
+        sourceBuilder.AppendLine("#pragma warning restore CS1591");
 
         return sourceBuilder.ToString();
     }

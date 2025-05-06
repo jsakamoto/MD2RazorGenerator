@@ -6,6 +6,7 @@ namespace Project01.Pages;
 
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 [IgnoreAntiforgeryToken]
+#pragma warning disable CS1591
 public class ErrorModel : PageModel
 {
     public string? RequestId { get; set; }
@@ -24,3 +25,4 @@ public class ErrorModel : PageModel
         RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
     }
 }
+#pragma warning restore CS1591
