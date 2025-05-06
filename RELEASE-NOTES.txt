@@ -1,3 +1,7 @@
+v.1.2.1
+- Fix: The generator did not recognize the "static using" syntax in "_Imports.razor" files.
+- Fix: Suppressed XML comment warning CS1591: "Missing XML comment for publicly visible type or member."
+
 v.1.2.0
 - Feature: Generated components now honor @using directives from _Imports.razor.
 
