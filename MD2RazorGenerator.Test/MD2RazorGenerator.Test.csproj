@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <_MD2Razor_MarkdownFile_Pattern>Fixtures\*.md</_MD2Razor_MarkdownFile_Pattern>
+    <_MD2Razor_MarkdownFile_Pattern>Fixtures\*.md;Fixtures\2025+Jan\*.md</_MD2Razor_MarkdownFile_Pattern>
   </PropertyGroup>
 
   <ItemGroup>

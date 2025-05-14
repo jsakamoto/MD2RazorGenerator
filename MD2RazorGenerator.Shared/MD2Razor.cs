@@ -89,7 +89,7 @@ public class MD2Razor
         }
 
         // Generate the class name and base class for the generated Razor component.
-        var className = Path.GetFileNameWithoutExtension(markdownPath).Replace('.', '_');
+        var className = ValidIdentifier.Create(Path.GetFileNameWithoutExtension(markdownPath));
         var baseClass = frontMatter.Inherit ?? globalOptions.DefaultBaseClass;
 
         // Generate the class definition for the Razor component.
@@ -192,7 +192,7 @@ public class MD2Razor
     /// <param name="markdownPath">The file path of the Markdown file.</param>
     /// <param name="globalOptions">Global options such as the root namespace and project directory.</param>
     /// <returns>The generated namespace as a string.</returns>
-    private static string GenerateNamespaceFromPath(string markdownPath, GlobalOptions globalOptions)
+    internal static string GenerateNamespaceFromPath(string markdownPath, GlobalOptions globalOptions)
     {
         // Get the relative path of the file from the project directory.
         var relativePath =
@@ -203,8 +203,10 @@ public class MD2Razor
         // Convert the relative path to a namespace format.
         var namespacePath = Path.GetDirectoryName(relativePath)?.Replace("/", ".").Replace("\\", ".") ?? "";
 
-        // Combine the root namespace and the relative path.
-        return (globalOptions.RootNamespace + "." + namespacePath).Trim('.');
+        // Sanitize and combine the root namespace and the relative path.
+        return string.Join(".", globalOptions.RootNamespace.Split('.').Concat(namespacePath.Split('.'))
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Select(ValidIdentifier.Create));
     }
 
     /// <summary>
@@ -221,10 +223,9 @@ public class MD2Razor
         basePath = PathUtils.NormalizePath(basePath, '.');
         path = PathUtils.NormalizePath(path, '.');
 
-        if (path.StartsWith(basePath, StringComparison.InvariantCultureIgnoreCase))
-        {
-            return path.Substring(basePath.Length).TrimStart('.');
-        }
-        return path;
+        return string.Join(".",
+            (path.StartsWith(basePath, StringComparison.InvariantCultureIgnoreCase) ?
+            path.Substring(basePath.Length) :
+            path).TrimStart('.').Split('.').Select(ValidIdentifier.Create));
     }
 }

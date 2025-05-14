@@ -147,4 +147,12 @@ public class GeneratedPageTests
             </table>
             """);
     }
+
+    [Test]
+    public void Directory_and_Filename_Includes_InvalidChars_Test()
+    {
+        using var context = new Bunit.TestContext();
+        using var cut = context.RenderComponent<global::MD2RazorGenerator.Test.Fixtures._2025_Jan._001_Sapporo>();
+        cut.MarkupMatches("<h1 id=\"section\">001</h1>");
+    }
 }
