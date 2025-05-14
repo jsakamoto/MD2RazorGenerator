@@ -1,3 +1,6 @@
+v.1.2.2
+- Fix: Files with invalid characters in their paths could not be compiled if those characters were not permitted in C# class or namespace names. Now such Markdown files are handled correctly.
+
 v.1.2.1
 - Fix: The generator did not recognize the "static using" syntax in "_Imports.razor" files.
 - Fix: Suppressed XML comment warning CS1591: "Missing XML comment for publicly visible type or member."
