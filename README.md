@@ -12,6 +12,10 @@ Live Demo Site: [https://jsakamoto.github.io/MD2RazorGenerator/](https://jsakamo
 
 Generated components work seamlessly with all Blazor rendering modes, including Server, WebAssembly, and Server-Side Rendering (SSR). It also fully supports hot reload, ensuring a smooth and productive development experience regardless of your chosen hosting model.
 
+For a quick visual overview, watch Jimmy Engström’s introduction video:
+
+[![](https://raw.githubusercontent.com/jsakamoto/MD2RazorGenerator/refs/heads/main/.assets/youtube-video-thumbnail.png)](https://youtu.be/3ABOgEScyRc)
+
 ## Quick Start
 
 **1.** Install the NuGet package via the .NET CLI:
