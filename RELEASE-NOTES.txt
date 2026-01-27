@@ -1,3 +1,6 @@
+v.1.2.3
+- Fix: The incremental source generator was regenerating all .md files even when only one file changed (or when no files changed).
+
 v.1.2.2
 - Fix: Files with invalid characters in their paths could not be compiled if those characters were not permitted in C# class or namespace names. Now such Markdown files are handled correctly.
 

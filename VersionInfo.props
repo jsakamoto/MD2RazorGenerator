@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Version>1.2.2</Version>
-    <Copyright>Copyright © 2025 J.Sakamoto, Mozilla Public License 2.0</Copyright>
+    <Version>1.2.3</Version>
+    <Copyright>Copyright © 2025-2026 J.Sakamoto, Mozilla Public License 2.0</Copyright>
     <Authors>J.Sakamoto</Authors>
     <Description>A C# source generator for Blazor that converts Markdown files (.md) into Razor components.</Description>
   </PropertyGroup>
