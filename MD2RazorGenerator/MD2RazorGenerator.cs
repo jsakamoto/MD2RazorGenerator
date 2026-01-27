@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Toolbelt.Blazor.MD2Razor.Internals;
 
 namespace Toolbelt.Blazor.MD2Razor;
@@ -16,7 +16,9 @@ public partial class MD2RazorGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Filter additional text files to include only Markdown (.md) files.
-        var markdownFiles = context.AdditionalTextsProvider.Where(t => t.Path.EndsWith(".md"));
+        var markdownFiles = context.AdditionalTextsProvider
+            .Where(t => t.Path.EndsWith(".md"))
+            .Select((t, token) => new MarkDownFile(t.Path, t.GetText(token)));
 
         var importsProvider = context.AdditionalTextsProvider
             .Where(t => Path.GetFileName(t.Path).Equals("_Imports.razor", StringComparison.InvariantCultureIgnoreCase))
@@ -31,9 +33,7 @@ public partial class MD2RazorGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(markdownFiles.Combine(globalOptionsProvider).Combine(importsProvider), (context, pair) =>
         {
             var ((markdownFile, globalOptions), imports) = pair;
-            var markdownText = markdownFile.GetText(context.CancellationToken)?.ToString();
-            if (markdownText is null) return;
-
+            var markdownText = markdownFile.Text;
             var generatedCode = md2razor.GenerateCode(markdownFile.Path, markdownText, imports, globalOptions);
             var hintName = MD2Razor.TransformToDotSeparatedPath(markdownFile.Path, globalOptions.ProjectDir) + ".g.cs";
             context.AddSource(hintName, generatedCode);
