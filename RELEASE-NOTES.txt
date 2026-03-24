@@ -1,3 +1,6 @@
+v.1.2.4
+- Fix: Resolved duplicate _Imports.razor registration in AdditionalFiles that caused hot reload to fail with CS8785 and CS0234 errors.
+
 v.1.2.3
 - Fix: The incremental source generator was regenerating all .md files even when only one file changed (or when no files changed).
 
