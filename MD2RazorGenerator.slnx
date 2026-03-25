@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/README/">
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="RELEASE-NOTES.txt" />
+    <File Path="THIRDPARTYNOTICES.txt" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="VersionInfo.props" />
+  </Folder>
+  <Project Path="MD2RazorGenerator.MSBuild.Task/MD2RazorGenerator.MSBuild.Task.csproj" />
+  <Project Path="MD2RazorGenerator.Shared/MD2RazorGenerator.Shared.shproj" />
+  <Project Path="MD2RazorGenerator.Test/MD2RazorGenerator.Test.csproj" />
+  <Project Path="MD2RazorGenerator/MD2RazorGenerator.csproj" />
+</Solution>
