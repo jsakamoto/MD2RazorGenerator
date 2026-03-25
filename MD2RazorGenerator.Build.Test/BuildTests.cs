@@ -4,6 +4,7 @@ using Toolbelt.Diagnostics;
 
 namespace MD2RazorGenerator.Build.Test;
 
+[Parallelizable(ParallelScope.Children)]
 public class BuildTests
 {
     public class TestContext : IDisposable
@@ -11,25 +12,35 @@ public class BuildTests
         public string TestProjectDir { get; }
         public WorkDirectory WorkDir { get; }
         public string AssemblyPath { get; }
-        public TestContext()
+        public TestContext(string targetFramework)
         {
             this.TestProjectDir = FileIO.FindContainerDirToAncestor("MD2RazorGenerator.Build.Test.csproj");
             this.WorkDir = new WorkDirectory(baseDir: Path.Combine([this.TestProjectDir, "bin", "Debug"]));
-            this.AssemblyPath = Path.Combine(this.WorkDir, "bin", "Debug", "net8.0", "Project01.dll");
+            this.AssemblyPath = Path.Combine(this.WorkDir, "bin", "Debug", targetFramework, "Project01.dll");
             FileIO.XcopyDir(
                 srcDir: Path.Combine([this.TestProjectDir, "Fixtures", "SampleProjects", "Project01"]),
                 dstDir: this.WorkDir,
                 predicate: arg => arg.Name is not "bin" and not "obj");
         }
+
+        public XProcess Start(string filename, string arguments) => XProcess.Start(filename, arguments, this.WorkDir);
+
         public void Dispose() => this.WorkDir.Dispose();
     }
 
-    [Test]
-    public async Task Specify_BaseClass_Test()
-    {
-        using var testContext = new TestContext();
+    public static IEnumerable<object[]> TargetFrameworks { get; } = [
+        ["net8.0"],
+        ["net9.0"],
+        ["net10.0"],
+    ];
 
-        using var build = await XProcess.Start("dotnet", "build -p MD2RazorDefaultBaseClass=CustomComponentBase", testContext.WorkDir).WaitForExitAsync();
+    [TestCaseSource(nameof(TargetFrameworks))]
+    public async Task Specify_BaseClass_Test(string targetFramework)
+    {
+        using var testContext = new TestContext(targetFramework);
+
+        using var build = testContext.Start("dotnet", $"build -f {targetFramework} -p MD2RazorDefaultBaseClass=CustomComponentBase");
+        await build.WaitForExitAsync();
         build.ExitCode.Is(0, build.Output);
 
         using var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath);
@@ -41,12 +52,12 @@ public class BuildTests
             .FullName.Is("Project01.Components.CustomComponentBase");
     }
 
-    [Test]
-    public async Task Change_BaseClass_from_Default_to_Custom_Test()
+    [TestCaseSource(nameof(TargetFrameworks))]
+    public async Task Change_BaseClass_from_Default_to_Custom_Test(string targetFramework)
     {
-        using var testContext = new TestContext();
+        using var testContext = new TestContext(targetFramework);
 
-        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+        using (var build = await testContext.Start("dotnet", $"build -f {targetFramework}").WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
 
         using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
@@ -71,12 +82,12 @@ public class BuildTests
         }
     }
 
-    [Test]
-    public async Task Change_BaseClass_from_Custom_to_Default_Test()
+    [TestCaseSource(nameof(TargetFrameworks))]
+    public async Task Change_BaseClass_from_Custom_to_Default_Test(string targetFramework)
     {
-        using var testContext = new TestContext();
+        using var testContext = new TestContext(targetFramework);
 
-        using (var build = await XProcess.Start("dotnet", "build -p MD2RazorDefaultBaseClass=CustomComponentBase", testContext.WorkDir).WaitForExitAsync())
+        using (var build = await testContext.Start("dotnet", $"build -f {targetFramework} -p MD2RazorDefaultBaseClass=CustomComponentBase").WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
 
         using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
@@ -101,14 +112,14 @@ public class BuildTests
         }
     }
 
-    [Test]
-    public async Task Clean_Test()
+    [TestCaseSource(nameof(TargetFrameworks))]
+    public async Task Clean_Test(string targetFramework)
     {
         // Given
-        using var testContext = new TestContext();
-        var generatedFilePath = Path.Combine(testContext.WorkDir, "obj", "Debug", "net8.0", "md2razor", "Welcome.md.g.cs");
+        using var testContext = new TestContext(targetFramework);
+        var generatedFilePath = Path.Combine(testContext.WorkDir, "obj", "Debug", targetFramework, "md2razor", "Welcome.md.g.cs");
 
-        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+        using (var build = await testContext.Start("dotnet", $"build -f {targetFramework}").WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
 
         File.Exists(generatedFilePath).IsTrue("The generated file should be generated after build, but it was not.");
@@ -121,12 +132,12 @@ public class BuildTests
         File.Exists(generatedFilePath).IsFalse("The generated file should be deleted after clean, but it was not.");
     }
 
-    [Test]
-    public async Task Move_FileLocation_Test()
+    [TestCaseSource(nameof(TargetFrameworks))]
+    public async Task Move_FileLocation_Test(string targetFramework)
     {
         // Given
-        using var testContext = new TestContext();
-        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+        using var testContext = new TestContext(targetFramework);
+        using (var build = await testContext.Start("dotnet", $"build -f {targetFramework}").WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
 
         using (var assembly = AssemblyDefinition.ReadAssembly(testContext.AssemblyPath))
@@ -141,7 +152,7 @@ public class BuildTests
         var newPathOfWelcomeMd = Path.Combine(testContext.WorkDir, "Pages", "Welcome.md");
         File.Move(oldPathOfWelcomeMd, newPathOfWelcomeMd);
 
-        using (var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync())
+        using (var build = await testContext.Start("dotnet", $"build -f {targetFramework}").WaitForExitAsync())
             build.ExitCode.Is(0, build.Output);
 
         // Then
@@ -153,11 +164,11 @@ public class BuildTests
         }
     }
 
-    [Test]
-    public async Task Has_Markdowns_with_SameName_in_DifferentDir_Test()
+    [TestCaseSource(nameof(TargetFrameworks))]
+    public async Task Has_Markdowns_with_SameName_in_DifferentDir_Test(string targetFramework)
     {
         // Given
-        using var testContext = new TestContext();
+        using var testContext = new TestContext(targetFramework);
         Directory.CreateDirectory(Path.Combine(testContext.WorkDir, "AnotherDir"));
         File.Copy(
             Path.Combine(testContext.WorkDir, "Welcome.md"),
@@ -165,7 +176,7 @@ public class BuildTests
         File.ReadAllText(Path.Combine(testContext.WorkDir, "AnotherDir", "Welcome.md")).Trim().Is("# Hello, World!");
 
         // When
-        using var build = await XProcess.Start("dotnet", "build", testContext.WorkDir).WaitForExitAsync();
+        using var build = await testContext.Start("dotnet", $"build -f {targetFramework}").WaitForExitAsync();
         build.ExitCode.Is(0, build.Output);
 
         // Then: There should be two types with the same name in different namespaces
