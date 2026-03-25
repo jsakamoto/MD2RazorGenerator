@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="bunit" Version="1.39.5" />
+    <PackageReference Include="bunit" Version="2.6.2" />
     <PackageReference Include="ChainingAssertion-NUnit.Bin" Version="4.0.1" />
     <PackageReference Include="coverlet.collector" Version="8.0.1">
       <PrivateAssets>all</PrivateAssets>

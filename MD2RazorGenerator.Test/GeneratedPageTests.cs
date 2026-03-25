@@ -1,4 +1,4 @@
-﻿using Bunit;
+using Bunit;
 using Fizz.Buzz.FizzBuzz;
 using Lorem.Ipsum;
 using MD2RazorGenerator.Test.Fixtures;
@@ -68,8 +68,8 @@ public class GeneratedPageTests
     [Test]
     public void HyperLinks_Test()
     {
-        using var context = new Bunit.TestContext();
-        using var cut = context.RenderComponent<Sample04_HyperLinks>();
+        using var context = new BunitContext();
+        using var cut = context.Render<Sample04_HyperLinks>();
 
         // If the URL is absolute, it should be opened in a new tab
         cut.MarkupMatches("""
@@ -85,8 +85,8 @@ public class GeneratedPageTests
     [Test]
     public void Title_in_Scaler_Test()
     {
-        using var context = new Bunit.TestContext();
-        using var cut = context.RenderComponent<Sample02_WithYamlFrontMatter_Scalar>();
+        using var context = new BunitContext();
+        using var cut = context.Render<Sample02_WithYamlFrontMatter_Scalar>();
 
         using var pageTitleComponent = cut.FindComponent<PageTitle>();
         pageTitleComponent.IsNotNull("Expected PageTitle component, but not found");
@@ -98,8 +98,8 @@ public class GeneratedPageTests
     [Test]
     public void Title_in_Sequence_Test()
     {
-        using var context = new Bunit.TestContext();
-        using var cut = context.RenderComponent<Sample03_WithYamlFrontMatter_Sequence>();
+        using var context = new BunitContext();
+        using var cut = context.Render<Sample03_WithYamlFrontMatter_Sequence>();
 
         using var pageTitleComponent = cut.FindComponent<PageTitle>();
         pageTitleComponent.IsNotNull("Expected PageTitle component, but not found");
@@ -121,8 +121,8 @@ public class GeneratedPageTests
     [Test]
     public void Table_Test()
     {
-        using var context = new Bunit.TestContext();
-        using var cut = context.RenderComponent<Sample05_Table>();
+        using var context = new BunitContext();
+        using var cut = context.Render<Sample05_Table>();
         cut.MarkupMatches("""
             <table>
                 <thead>
@@ -151,8 +151,8 @@ public class GeneratedPageTests
     [Test]
     public void Directory_and_Filename_Includes_InvalidChars_Test()
     {
-        using var context = new Bunit.TestContext();
-        using var cut = context.RenderComponent<global::MD2RazorGenerator.Test.Fixtures._2025_Jan._001_Sapporo>();
+        using var context = new BunitContext();
+        using var cut = context.Render<global::MD2RazorGenerator.Test.Fixtures._2025_Jan._001_Sapporo>();
         cut.MarkupMatches("<h1 id=\"section\">001</h1>");
     }
 }
