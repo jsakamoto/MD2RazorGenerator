@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="bunit" Version="1.39.5" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     <PackageReference Include="ChainingAssertion-NUnit.Bin" Version="4.0.1" />
     <PackageReference Include="coverlet.collector" Version="8.0.1">
       <PrivateAssets>all</PrivateAssets>
@@ -28,25 +28,23 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MD2RazorGenerator\MD2RazorGenerator.csproj" />
-    <ProjectReference Include="..\MD2RazorGenerator\MD2RazorGenerator.csproj">
-      <OutputItemType>Analyzer</OutputItemType>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <PackageReference Include="Toolbelt.WorkDirectory" Version="1.1.0.1" />
+    <PackageReference Include="XProcess" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
-    <Using Include="MD2RazorGenerator.Test" />
+    <Using Include="MD2RazorGenerator.Build.Test" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <_MD2Razor_MarkdownFile_Pattern>Fixtures\*.md;Fixtures\2025+Jan\*.md</_MD2Razor_MarkdownFile_Pattern>
-  </PropertyGroup>
-
-  <Import Project="../MD2RazorGenerator/PackageContents/build/MD2RazorPopulateMarkdownFiles.targets" />
+  <ItemGroup>
+    <Compile Remove="Fixtures\SampleProjects\**\*.*" />
+    <Content Remove="Fixtures\SampleProjects\**\*.*" />
+    <None Remove="Fixtures\SampleProjects\**\*.*" />
+    <None Include="Fixtures\SampleProjects\**\*.*" />
+    <None Remove="Fixtures\SampleProjects\**\*.user" />
+    <None Remove="Fixtures\SampleProjects\**\bin\**\*.*" />
+    <None Remove="Fixtures\SampleProjects\**\obj\**\*.*" />
+  </ItemGroup>
 
 </Project>

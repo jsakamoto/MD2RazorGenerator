@@ -1,8 +1,8 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using Toolbelt;
 using Toolbelt.Diagnostics;
 
-namespace MD2RazorGenerator.Test;
+namespace MD2RazorGenerator.Build.Test;
 
 public class BuildTests
 {
@@ -13,7 +13,7 @@ public class BuildTests
         public string AssemblyPath { get; }
         public TestContext()
         {
-            this.TestProjectDir = FileIO.FindContainerDirToAncestor("MD2RazorGenerator.Test.csproj");
+            this.TestProjectDir = FileIO.FindContainerDirToAncestor("MD2RazorGenerator.Build.Test.csproj");
             this.WorkDir = new WorkDirectory(baseDir: Path.Combine([this.TestProjectDir, "bin", "Debug"]));
             this.AssemblyPath = Path.Combine(this.WorkDir, "bin", "Debug", "net8.0", "Project01.dll");
             FileIO.XcopyDir(

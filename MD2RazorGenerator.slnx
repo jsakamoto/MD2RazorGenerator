@@ -13,8 +13,11 @@
   <Folder Name="/Solution Items/">
     <File Path="VersionInfo.props" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="MD2RazorGenerator.Build.Test/MD2RazorGenerator.Build.Test.csproj" />
+    <Project Path="MD2RazorGenerator.Test/MD2RazorGenerator.Test.csproj" />
+  </Folder>
   <Project Path="MD2RazorGenerator.MSBuild.Task/MD2RazorGenerator.MSBuild.Task.csproj" />
   <Project Path="MD2RazorGenerator.Shared/MD2RazorGenerator.Shared.shproj" />
-  <Project Path="MD2RazorGenerator.Test/MD2RazorGenerator.Test.csproj" />
   <Project Path="MD2RazorGenerator/MD2RazorGenerator.csproj" />
 </Solution>

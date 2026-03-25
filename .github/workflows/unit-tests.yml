@@ -10,15 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout the code
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Install .NET SDK
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             9.0.x
 
       # Perform unit tests
       - name: Perform unit tests
-        run: dotnet test MD2RazorGenerator.Test -l "console;verbosity=normal" -v:q --nologo -tl:off
+        run: dotnet test --project MD2RazorGenerator.Test --output detailed
+      - name: Perform unit tests for build
+        run: dotnet test --project MD2RazorGenerator.Build.Test --output detailed
